@@ -2,20 +2,19 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
+use Illuminate\Redis\Database;
 
-abstract class Job
+class Job
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Queueable Jobs
-    |--------------------------------------------------------------------------
-    |
-    | This job base class provides a central location to place any logic that
-    | is shared across all of your jobs. The trait included with the class
-    | provides access to the "onQueue" and "delay" queue helper methods.
-    |
-    */
+    private $n;
 
-    use Queueable;
+    public function __construct($n)
+    {
+        $this->n = $n;
+    }
+
+    public function handle(Database $database)
+    {
+        $database->connection()->hdel('hash_table', $this->n);
+    }
 }
