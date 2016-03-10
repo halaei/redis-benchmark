@@ -18,6 +18,7 @@ class Pop extends Command
 
         $n = $this->argument('n');
         $i = 0;
+        $stall = microtime(true);
         while ($i < $n) {
             try {
                 $job = $queueManager->connection()->pop();
@@ -27,11 +28,13 @@ class Pop extends Command
                     $job->fire();
                     $i++;
                 }
+                $stall = microtime(true);
             } catch (\Exception $e) {
                 $database->connection()->incr('pop_exception:' . get_class($e));
+                $database->connection()->lpush('pop_stall:' . getmypid(), microtime(true) - $stall);
             }
         }
 
-        $database->connection()->set('last_pop:' . posix_getpid(), microtime(true) - $start);
+        $database->connection()->set('last_pop:' . getmypid(), microtime(true) - $start);
     }
 }

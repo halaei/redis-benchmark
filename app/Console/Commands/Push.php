@@ -29,6 +29,6 @@ class Push extends Command
             }
         }
 
-        $database->connection()->set('last_push:' . posix_getpid(), microtime(true) - $start);
+        $database->connection()->set('last_push:' . getmypid(), microtime(true) - $start);
     }
 }
